@@ -12,38 +12,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy-staging:
-    name: Deploy to staging
-    needs: ci
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-
-    environment:
-      name: staging
-      url: ${{ vars.STAGING_API_URL }}
-
-    permissions:
-      contents: read
-
-    concurrency:
-      group: staging-deployment
-      cancel-in-progress: false
-
-    steps:
-      - name: Trigger Render staging deployment
-        env:
-          DEPLOY_HOOK: ${{ secrets.RENDER_STAGING_DEPLOY_HOOK }}
-        run: |
-          if [ -z "$DEPLOY_HOOK" ]; then
-            echo "Staging deployment hook is not configured."
-            exit 1
-          fi
-
-          curl --fail --silent --show-error \
-            --output /dev/null \
-            --request POST "$DEPLOY_HOOK"
-
-          echo "Staging deployment requested."
   backend:
     name: Backend tests
     runs-on: ubuntu-latest
